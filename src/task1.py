@@ -12,27 +12,26 @@ from sklearn.model_selection import GridSearchCV
 class MoodGuessUseCase:
     def __init__(self):
         train_csv = pd.read_csv("E:/dstesttask1/train.csv", index_col='id')
-        numpy_array = train_csv.to_numpy()
-        review_train = numpy_array[:, 0] # aka X_train
-        self.sentiment_train = numpy_array[:, 1].astype('int') # aka Y_train
+        #numpy_array = train_csv.to_numpy()
+        #review_train = numpy_array[:, 0] # aka X_train
+        #self.sentiment_train = numpy_array[:, 1].astype('int') # aka Y_train
 
         #X_train, X_test, Y_train, Y_test = train_test_split(
         #X, Y, test_size=0.4, random_state=42)
 
-        text_clf = Pipeline([('vect', CountVectorizer(stop_words='english')),
-                             ('tfidf', TfidfTransformer()),
-                             ('clf', MultinomialNB()),
-                             ])
-        parameters = {'clf__alpha': (1e-2, 1e-3),
-                      'tfidf__use_idf': (True, False),
-                      'vect__ngram_range': [(1, 1), (1, 2)],
-                      }
+        train['sentiment'].value_counts()
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        tfidf = TfidfVectorizer(min_df=5)
+        train_tfidf = tfidf.fit_transform(train['review'])
+        train_tfidf.shape
 
-        gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)
-        self.gs_clf = gs_clf.fit(review_train, self.sentiment_train)
+        self.est = MultinomialNB().fit(train_tfidf, train['sentiment'].values)
+        test_tfidf = tfidf.transform(test['review'].values)
+
+        #self.gs_clf = gs_clf.fit(review_train, self.sentiment_train)
 
     def predict(self, reviews):
-        self.predicted = self.gs_clf.predict(reviews)
+        self.predicted = self.est.predict(test_tfidf)
         return self.predicted
 
     def print_accuracy(self):
