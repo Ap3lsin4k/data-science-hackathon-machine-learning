@@ -1,2 +1,3 @@
-class Task1:
-    pass
+class MoodGuessUseCase:
+    def is_positive(self, param):
+        return 0
