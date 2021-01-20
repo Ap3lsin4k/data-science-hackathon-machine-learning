@@ -1,4 +1,4 @@
-from src.task1 import control
+from src.presentation import control
 
 
 def test_integration_whole_system():

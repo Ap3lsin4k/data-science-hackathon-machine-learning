@@ -1,7 +1,7 @@
 import pandas
 import pytest
 
-from src.task1 import present, control
+from src.presentation import present, control
 
 
 def get_submission():
