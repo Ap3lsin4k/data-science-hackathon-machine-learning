@@ -5,7 +5,7 @@ mood = MoodGuessUseCase()
 # TODO Use case doesn't know about algorithm we are using, and we can easily change between the two
 # TODO have ability to pickle neural network
 # TODO two modes: development mode for training and showing the accuracy, then showing what tests went wrong As a develper of ML I want to , so that I can
-# TODO second mode: release mode
+# second mode: release mode
 # TODO for different algorithms find the intersection of failing data to be able to analyse it
 
 def test_really_short_positive_comment():
