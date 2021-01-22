@@ -4,22 +4,22 @@ import pytest
 from src.presentation import present, control
 
 
-def get_submission():
-    pass
-
-def test_nothing():
-#    with pytest.raises(FileNotFoundError):
-#        open("D:/projects/ds/data-science-hackathon-machine-learning/mysubmission.csv")
-    present([1, 1, 0])
-    with open("D:/projects/ds/data-science-hackathon-machine-learning/mysubmission.csv") as f:
-        assert len(f.read()) == 68903
 
 
 
+
+def test_remove():
+    import os
+    os.remove("filename.txt")
+
+def test_path():
+    with open("../src/filename.txt", "w") as f:
+        pass
 
 
 def test_open_csv():
  #   control()
+    present()
     with open("E:/dstesttask1/submission.csv") as f:
         assert len(f.read()) == 68903
 

@@ -3,9 +3,9 @@ import pandas as pd
 from src.task1 import MoodGuessUseCase
 
 
-def present(param):
+def present(sentiment):
     submission = pd.read_csv("E:/dstesttask1/defaultsubmission.csv")
-    submission['sentiment'] = param
+    submission['sentiment'] = sentiment
     submission.to_csv("E:/dstesttask1/submission.csv", index=False)
 
 

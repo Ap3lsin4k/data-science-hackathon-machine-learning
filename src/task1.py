@@ -23,7 +23,6 @@ class MoodGuessUseCase:
         from sklearn.feature_extraction.text import TfidfVectorizer
         self.tfidf = TfidfVectorizer(min_df=5)
         train_tfidf = self.tfidf.fit_transform(train['review'])
-        train_tfidf.shape
 
         self.est = MultinomialNB().fit(train_tfidf, train['sentiment'].values)
 
@@ -35,10 +34,7 @@ class MoodGuessUseCase:
         self.predicted = self.est.predict(reviews_test)
         return self.predicted
 
-    def print_accuracy(self):
-        print("Accuracy mean:", np.mean(self.predicted == self.sentiment_train))
-
-    def loads(self):
-        pass
+#    def print_accuracy(self):
+#        print("Accuracy mean:", np.mean(self.predicted == self.sentiment_train))
 
 
