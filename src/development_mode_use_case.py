@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.task1 import MoodPredictionModel
+from src.task1_model import MoodPredictionModel
 
 
 class DevelopmentReleaseModeUseCase(object):
@@ -9,8 +9,12 @@ class DevelopmentReleaseModeUseCase(object):
         pass
 
     def train(self, model, training_review, training_sentiment):
+        self.model = model
         model.fit(training_review, training_sentiment)
         pass
+
+    def predict(self, testing_reviews):
+        return self.model.predict(testing_reviews)
 
     def compute_accuracy(self, param, param1):
         return np.mean(param == param1)

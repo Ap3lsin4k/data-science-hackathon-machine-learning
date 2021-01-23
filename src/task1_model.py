@@ -17,7 +17,7 @@ class MoodPredictionModel:
         return self.predicted
 
 
-    def fit(self):
+    def fit(self, training_reviews, array_of_expected_sentiment):
         train = pd.read_csv("E:/dstesttask1/train.csv", index_col='id')
         # numpy_array = train_csv.to_numpy()
         # review_train = numpy_array[:, 0] # aka X_train
