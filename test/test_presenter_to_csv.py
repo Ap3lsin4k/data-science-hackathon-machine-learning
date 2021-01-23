@@ -3,25 +3,20 @@ import pytest
 
 from src.presentation import present, control
 
+import os
 
-def get_submission():
-    pass
+from datetime import datetime
+import tempfile
 
-def test_nothing():
-#    with pytest.raises(FileNotFoundError):
-#        open("D:/projects/ds/data-science-hackathon-machine-learning/mysubmission.csv")
-    present([1, 1, 0])
-    with open("D:/projects/ds/data-science-hackathon-machine-learning/mysubmission.csv") as f:
-        assert len(f.read()) == 68903
+def test_path():
+    _ = open("../src/filename.txt", "w")
 
 
+def test_release_new_submission_csv_with_unique_name():
+    # create a temporary directory
+    with tempfile.TemporaryDirectory() as directory:
+        newsubmissionpath = directory + "released submission -1 00.00.00.csv"
 
-
-
-def test_open_csv():
- #   control()
-    with open("E:/dstesttask1/submission.csv") as f:
-        assert len(f.read()) == 68903
-
-    submission = pandas.read_csv("E:/dstesttask1/submission.csv")
-    assert submission['sentiment'].value_counts() == 9999
+        assert not os.path.isfile(newsubmissionpath)
+        present([1, 1, 0, 1, 0]*2000, newsubmissionpath)
+        assert os.path.isfile(newsubmissionpath)
