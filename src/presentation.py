@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pandas as pd
 
-from src.task1 import MoodGuessUseCase
+from src.task1 import MoodPredictionModel
 
 
 def present(sentiment_column, submission_csv_path="model/data/newsubmission.csv"):
@@ -17,7 +17,7 @@ def get_new_submission_path_with_version():
 
 def control():
     # Res
-    mood = MoodGuessUseCase()
+    mood = MoodPredictionModel()
 
     test = pd.read_csv("E:/dstesttask1/test.csv", index_col='id')
 
