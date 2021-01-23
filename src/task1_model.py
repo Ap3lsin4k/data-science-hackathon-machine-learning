@@ -16,8 +16,7 @@ class MoodPredictionModel:
         self.predicted = self.est.predict(reviews_test)
         return self.predicted
 
-
-    def fit(self, training_reviews, array_of_expected_sentiment):
+    def auto_fit(self):
         train = pd.read_csv("E:/dstesttask1/train.csv", index_col='id')
         # numpy_array = train_csv.to_numpy()
         # review_train = numpy_array[:, 0] # aka X_train
@@ -34,6 +33,10 @@ class MoodPredictionModel:
         self.est = MultinomialNB().fit(train_tfidf, train['sentiment'].values)
 
         # self.gs_clf = gs_clf.fit(review_train, self.sentiment_train)
+
+
+    def deprecated_fit(self, training_reviews, array_of_expected_sentiment):
+        self.auto_fit()
 
 #    def print_accuracy(self):
 #        print("Accuracy mean:", np.mean(self.predicted == self.sentiment_train))

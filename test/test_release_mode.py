@@ -15,6 +15,9 @@ class StubModel(object):
         self.training_review = training_review[0]
         self.expected_sentiment = expected_sentiment[0]
 
+    def deprecated_fit(self):
+        pass
+
 
 def test_use_case_calls_model():
     c = DevelopmentReleaseModeUseCase(StubModel())
@@ -24,3 +27,8 @@ def test_use_case_calls_model():
     assert model.fit_was_called
     assert model.training_review == "A DAMN GOOD MOVIE! I give it a 10/10."
     assert model.expected_sentiment == 1
+
+
+def test_use_case_release_mode():
+    c = DevelopmentReleaseModeUseCase(StubModel())
+    assert 0.85 < c.compute_accuracy_using_testing_data_from_train_csv() < 1

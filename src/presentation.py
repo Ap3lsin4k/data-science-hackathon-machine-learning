@@ -20,6 +20,6 @@ def control():
 
     test = pd.read_csv("E:/dstesttask1/test.csv", index_col='id')
 
-    mood.fit(None, None)
+    mood.deprecated_fit(None, None)
     mood.predict(test['review'].values)
     present(mood.predicted, get_new_submission_path_with_version())
