@@ -3,6 +3,7 @@ import pandas as pd
 import os
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics import confusion_matrix
 
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
@@ -41,10 +42,37 @@ class FirstAlgorithm():
         return predicted
 
     def print_prediction(self):
-        print(np.mean(fa.predict() == self.Y_test))
+        print(np.mean(self.predict() == self.Y_test))
+    
+    def confusion_matrix(self):
+        return confusion_matrix(fa.predict(),self.Y_test.astype(int))
     # TODO print what is left unknown
-
+    def pred_data(self,data):
+        predicted = self.text_clf.predict(data)
+        return predicted
+        
 FirstAlgorithm()
 fa = FirstAlgorithm()
 fa.fit()
 fa.print_prediction()
+
+errors_false_pos = []
+errors_false_neg = []
+
+#saving errors
+for x,y_true in zip(fa.X_test,fa.Y_test):
+    y_pred = fa.pred_data([x])
+    
+    if y_pred != y_true:
+        if y_pred == 1:
+            # y_pred = 1 and y_true = 0
+            errors_false_neg.append(x)
+        else:
+            # y_pred = 0 and y_true = 1  
+            errors_false_pos.append(x)
+            
+errors_false_pos = pd.DataFrame(errors_false_pos)
+errors_false_neg = pd.DataFrame(errors_false_neg)
+
+errors_false_neg.to_csv('false_neg.csv')
+errors_false_pos.to_csv('false_pos.csv')
