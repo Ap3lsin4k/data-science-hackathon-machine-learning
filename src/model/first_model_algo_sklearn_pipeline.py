@@ -24,7 +24,7 @@ class FirstAlgorithm():
         Y = numpy_array[:, 1]
 
         self.X_train, self.X_test, Y_train, self.Y_test = train_test_split(
-            X, Y, test_size=0.95, random_state=42)
+            X, Y, test_size=0.4, random_state=42)
         # don't split if the given data base is already a split
         self.Y_train = Y_train.astype('int')
 
@@ -46,7 +46,7 @@ class FirstAlgorithm():
     
     def confusion_matrix(self):
         return confusion_matrix(fa.predict(),self.Y_test.astype(int))
-    # TODO print what is left unknown
+
     def pred_data(self,data):
         predicted = self.text_clf.predict(data)
         return predicted
@@ -56,8 +56,8 @@ fa = FirstAlgorithm()
 fa.fit()
 fa.print_prediction()
 
-errors_false_pos = []
-errors_false_neg = []
+errors_false_negative = []
+errors_false_positive = []
 
 #saving errors
 for x,y_true in zip(fa.X_test,fa.Y_test):
@@ -66,13 +66,13 @@ for x,y_true in zip(fa.X_test,fa.Y_test):
     if y_pred != y_true:
         if y_pred == 1:
             # y_pred = 1 and y_true = 0
-            errors_false_neg.append(x)
+            errors_false_positive.append(x)
         else:
             # y_pred = 0 and y_true = 1  
-            errors_false_pos.append(x)
+            errors_false_negative.append(x)
             
-errors_false_pos = pd.DataFrame(errors_false_pos)
-errors_false_neg = pd.DataFrame(errors_false_neg)
+errors_false_negative = pd.DataFrame(errors_false_negative)
+errors_false_positive = pd.DataFrame(errors_false_positive)
 
-errors_false_neg.to_csv('false_neg.csv')
-errors_false_pos.to_csv('false_pos.csv')
+errors_false_positive.to_csv('../../kaggle/working/negative_wrongly_predicted_as_positive.csv', index=False)
+errors_false_negative.to_csv('../../kaggle/working/positive_wrongly_predicted_as_negative.csv', index=False)
