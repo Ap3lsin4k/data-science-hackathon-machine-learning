@@ -64,9 +64,9 @@ def clean(X_input):
         document = [stemmer.lemmatize(word) for word in document]
         document = ' '.join(document)
 
-        documents.append(document)
+    #    documents.append(document)
 
-    return np.array(documents)
+   # return np.array(documents)
     # predicted = text_clf2.predict(X_test)
     # np.mean(predicted == Y_test)
 
