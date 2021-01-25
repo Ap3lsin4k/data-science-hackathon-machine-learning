@@ -1,5 +1,4 @@
 from src.development_mode_use_case import DevelopmentReleaseModeUseCase
-from src.task1_model import MoodPredictionModel
 
 
 class StubModel(object):

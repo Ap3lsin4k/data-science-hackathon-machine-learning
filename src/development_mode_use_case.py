@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from src.task1_model import MoodPredictionModel
+from src.model.task1_model import MoodPredictionModel
 
 
 class DevelopmentReleaseModeUseCase(object):

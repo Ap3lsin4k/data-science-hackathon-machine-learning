@@ -1,6 +1,6 @@
 from src.development_mode_use_case import DevelopmentReleaseModeUseCase
 from src.model.disperse_estimation import de
-from src.task1_model import *
+from src.model.task1_model import *
 
 # takes a long time to teach the neural network
 # todo use dummy instead of the model to have

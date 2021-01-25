@@ -1,4 +1,5 @@
 import numpy
+from numpy.core._multiarray_umath import ndarray
 from sklearn.linear_model import SGDClassifier
 
 
@@ -32,7 +33,7 @@ for dirname, _, filenames in os.walk('/kaggle/input'):
     for filename in filenames:
         print(os.path.join(dirname, filename))
 
-data = pd.read_csv("D:/projects/ds/data-science-hackathon-machine-learning/train.csv",index_col='id')
+
 
 # test.csv
 import numpy as np
@@ -70,27 +71,31 @@ def clean(X_input):
     # np.mean(predicted == Y_test)
 
 
-numpy_array = data.to_numpy()
-X = clean(numpy_array[:, 0])
-Y = numpy_array[:, 1]
+class HeavyModel():
 
+    text_clf: Pipeline
+    reviews_train: ndarray
+
+    def __init__(self, train_csv):
+        self.train_csv = train_csv
+        self.sentiment_train = []
+
+    def fit(self):
+        numpy_array = self.train_csv.to_numpy()
+        self.reviews_train = clean(numpy_array[:, 0])
+        sentiment_train = numpy_array[:, 1]
+        self.sentiment_train = sentiment_train.astype('int')
+
+        self.text_clf = Pipeline([('vect', CountVectorizer(stop_words='english')),
+                             ('tfidf', TfidfTransformer()),
+                             ('clf', MultinomialNB()),
+                             ]).fit(self.reviews_train, sentiment_train)
 
 #X_train, X_test, Y_train, Y_test = train_test_split(
 #     X, Y, test_size=0.4, random_state=42)
  # don't split if the given data base is already a split
 
-
-text_clf = Pipeline([('vect', CountVectorizer(stop_words='english')),
-('tfidf', TfidfTransformer()),
-('clf', MultinomialNB()),
-])
-
-Y=Y.astype('int')
-text_clf = text_clf.fit(X, Y)
-
-
-
-
-predicted = text_clf.predict(clean(X))
-print(np.mean(predicted == Y))
-
+    def predict(self, reviews_train):
+        predicted = self.text_clf.predict(clean(reviews_train))
+        print(np.mean(predicted == self.sentiment_train))
+        return predicted
