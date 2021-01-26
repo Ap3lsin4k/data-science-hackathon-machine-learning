@@ -95,23 +95,10 @@ class SmartStableCV:
         review_train = (numpy_array[:, 0]) # aka X_train
         self.sentiment_train = numpy_array[:, 1].astype('int') # aka Y_train
 
-        #X_train, X_test, Y_train, Y_test = train_test_split(
-        #X, Y, test_size=0.4, random_state=42)
-
-        #text_clf = Pipeline([('vect', CountVectorizer(stop_words='english')),
-             #                ('tfidf', TfidfTransformer()),
-              #               ('clf', MultinomialNB()),
-              #               stop_words = set(stopwords.words('english'))
-       # ])
-        #text_clf= Pipeline([
-          #  ( "tfidf", TfidfVectorizer()), ("svc", SVC(kernel="linear"))
-        #])
-        #text_clf.get_params().keys()
-        parameters = { 'C': [0.25, 0.5, 0.75, 1, 1.5, 2]
+        parameters = { 'C' : [0.01, 0.05, 0.125, 0.17, 0.2, 0.25,0.30, 0.5, 0.75, 1, 1.5, 2, 3, 5, 10]
                     }
-
         gs_clf = GridSearchCV(LinearSVC(), parameters, scoring='f1', n_jobs=-1)
-        self.tfidf=TfidfVectorizer(min_df=3, max_df =0.5, ngram_range=(1,2))
+        self.tfidf=TfidfVectorizer(min_df=5, max_df =0.7, ngram_range=(1,5))
         review_train=self.tfidf.fit_transform(train_csv['processed'])
         self.gs_clf = gs_clf.fit(review_train, self.sentiment_train)
 
@@ -138,6 +125,9 @@ stop_words = set(stopwords.words('english'))
 
 
 def process(text):
+
+    res = re.sub(r'\s+', ' ', text, flags=re.I)
+    res = re.sub(r'^br\s+', '', text)
     res = re.sub('<.*?>', ' ', text)
     res = re.sub('\W', ' ', res)
     res = re.sub('\s+[a-zA-Z]\s+', ' ', res)
