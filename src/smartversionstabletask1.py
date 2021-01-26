@@ -5,6 +5,7 @@ import pickle
 import sys
 from datetime import datetime
 
+#import estimator as estimator
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 
@@ -26,11 +27,9 @@ nltk.download('punkt')
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import LinearSVC
+from sklearn.svm import LinearSVC, SVC
 from sklearn.model_selection import GridSearchCV
 
-train_csv = pd.read_csv('kaggle/input/text-classification-int20h/train.csv', index_col = 'id')
-test = pd.read_csv('kaggle/input/text-classification-int20h/test.csv', index_col = 'id')
 
 import pandas as pd
 
@@ -77,21 +76,20 @@ class SmartStableCV:
             # Lemmatization
             #document = ' '.join(document)
         return document
-    def __init__(self):
+    def __init__(self, train_csv_processed):
         self.gs_clf = "string"
         if os.path.isfile("kaggle/working/gs_classifier.pickle"):
             print("Using precomputed classifier from \"kaggle/working/gs_classifier.pickle\" ")
             self.load()
         else:
             print("Teaching on training reviews")
-            self.fit()
+            self.fit(train_csv_processed)
             print("Dumping")
-            self.dump()
+            #self.dump()
 
-    def fit(self):
+    def fit(self, train_csv):
 
 
-        train_csv['processed'] = train_csv['review'].apply(lambda x: process(x))
 
         numpy_array = train_csv.to_numpy()
         review_train = (numpy_array[:, 0]) # aka X_train
@@ -100,24 +98,29 @@ class SmartStableCV:
         #X_train, X_test, Y_train, Y_test = train_test_split(
         #X, Y, test_size=0.4, random_state=42)
 
-        text_clf = Pipeline([('vect', CountVectorizer(stop_words='english')),
-                             ('tfidf', TfidfTransformer()),
-                             ('clf', MultinomialNB()),
-                             ])
+        #text_clf = Pipeline([('vect', CountVectorizer(stop_words='english')),
+             #                ('tfidf', TfidfTransformer()),
+              #               ('clf', MultinomialNB()),
+              #               stop_words = set(stopwords.words('english'))
+       # ])
+        #text_clf= Pipeline([
+          #  ( "tfidf", TfidfVectorizer()), ("svc", SVC(kernel="linear"))
+        #])
+        #text_clf.get_params().keys()
+        parameters = { 'C': [0.25, 0.5, 0.75, 1, 1.5, 2]
+                    }
 
-        parameters = {'clf__alpha': (1e-2, 1e-3),
-                      'tfidf__use_idf': (True, False),
-                      'vect__ngram_range': [(1, 1), (1, 2)],
-                      }
-
-        gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)
+        gs_clf = GridSearchCV(LinearSVC(), parameters, scoring='f1', n_jobs=-1)
+        self.tfidf=TfidfVectorizer(min_df=3, max_df =0.5, ngram_range=(1,2))
+        review_train=self.tfidf.fit_transform(train_csv['processed'])
         self.gs_clf = gs_clf.fit(review_train, self.sentiment_train)
 
 
     def predict(self, reviews):
-        self.predicted = self.gs_clf.predict(reviews)
+        #tfidf=TfidfVectorizer(min_df=3, max_df=0.5, ngram_range=(1,2))
+        reviews= self.tfidf.transform(reviews)
+        self.predicted = self.gs_clf.best_estimator_.predict(reviews)
         return self.predicted
-
     def print_accuracy(self):
         print("Accuracy mean:", np.mean(self.predicted == self.sentiment_train))
 
@@ -153,26 +156,28 @@ def get_new_submission_path_with_version():
     return datetime.now().strftime("kaggle/working/newsubmission %d %H;%M;%S.csv")  # day hour:minutes:seconds
 
 def control():
-    test['processed'] = test['review'].apply(lambda x: process(x))
+    train_csv = pd.read_csv('kaggle/input/text-classification-int20h/train.csv', index_col='id')
+    test_csv = pd.read_csv('kaggle/input/text-classification-int20h/test.csv', index_col='id')
+    test_csv['processed'] = test_csv['review'].apply(lambda x: process(x))
+    train_csv['processed'] = train_csv['review'].apply(lambda x: process(x))
 
-    sdata = test
     # test.csv
     import numpy as np
-    numpy_array = sdata.to_numpy()
+    numpy_array = test_csv.to_numpy()
     reviews_test = numpy_array[:, 0] # 0 is reviews
 
     # Res
     print("construction")
-    model = SmartStableCV()
+    model = SmartStableCV(train_csv)
 
     print("predicting...")
     #mood.dump()
 
 
-    present(model.predict(reviews_test), get_new_submission_path_with_version())
+    present(model.predict(test_csv['processed']), get_new_submission_path_with_version())
 
     predicted = model.predict(pd.read_csv("kaggle/input/text-classification-int20h/TRAINing Reviewsset").to_numpy()[:, 0])
-    print(predicted, len(predicted))
+    print("Predicted on training reviews", predicted, len(predicted))
     true_sentiment = pd.read_csv("kaggle/input/text-classification-int20h/TRAINing Reviewsset")['sentiment'].map({
     "positive":1,
     "negative":0
