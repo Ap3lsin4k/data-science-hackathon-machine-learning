@@ -3,6 +3,7 @@
 # For example, here's several helpful packages to load
 import pickle
 import sys
+from datetime import datetime
 
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
@@ -97,10 +98,14 @@ class SmartStableCV:
 
 
 
+
 def present(sentiment_column, submission_csv_path="model/data/newsubmission.csv"):
     submission = pd.read_csv("../src/model/data/defaultsubmission.csv")
     submission['sentiment'] = sentiment_column
     submission.to_csv(submission_csv_path, index=False)
+
+def get_new_submission_path_with_version():
+    return datetime.now().strftime("kaggle/working/newsubmission %d %H;%M;%S.csv")  # day hour:minutes:seconds
 
 def control():
     sdata = test
@@ -117,7 +122,7 @@ def control():
     #mood.dump()
 
 
-    present(model.predict(reviews_test))
+    present(model.predict(reviews_test), get_new_submission_path_with_version())
 
     predicted = model.predict(pd.read_csv("kaggle/input/text-classification-int20h/TRAINing Reviewsset").to_numpy()[:, 0])
     print(predicted, len(predicted))

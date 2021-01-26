@@ -8,9 +8,6 @@ import os
 from datetime import datetime
 import tempfile
 
-def test_path():
-    _ = open("../src/filename.txt", "w")
-
 
 def test_release_new_submission_csv_with_unique_name():
     # create a temporary directory
