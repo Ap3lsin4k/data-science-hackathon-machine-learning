@@ -16,6 +16,6 @@ def get_new_submission_path_with_version():
 
 
 def control(model):
-    model.fit()
+    #model.fit()
     predicted_array_of_sentiments = model.predict()
     present(predicted_array_of_sentiments, get_new_submission_path_with_version())

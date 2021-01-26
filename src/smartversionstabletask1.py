@@ -42,11 +42,35 @@ from sklearn.pipeline import Pipeline
 import numpy as np
 # test.csv
 from sklearn.model_selection import GridSearchCV
+from nltk.stem import WordNetLemmatizer
 
 
 class SmartStableCV:
     gs_clf: GridSearchCV
 
+    def clean(X_input):
+        stemmer = WordNetLemmatizer()
+
+        for sen in range(0, len(X_input)):
+            # Remove all the special characters
+            document = re.sub(r'\W', ' ', str(X_input[sen]))
+
+            # remove all single characters
+            document = re.sub(r'\s+[a-zA-Z]\s+', ' ', document)
+
+            # Substituting multiple spaces with single space
+            document = re.sub(r'\s+', ' ', document, flags=re.I)
+
+            # Removing prefixed 'b'
+            document = re.sub(r'^b\s+', '', document)
+
+            # Converting to Lowercase
+            #
+            #    document = document.lower()
+
+            # Lemmatization
+            document = ' '.join(document)
+        return document
     def __init__(self):
         self.gs_clf = "string"
         if os.path.isfile("kaggle/working/gs_classifier.pickle"):
@@ -60,7 +84,7 @@ class SmartStableCV:
 
     def fit(self):
         numpy_array = train_csv.to_numpy()
-        review_train = numpy_array[:, 0] # aka X_train
+        review_train = self.clean(numpy_array[:, 0]) # aka X_train
         self.sentiment_train = numpy_array[:, 1].astype('int') # aka Y_train
 
         #X_train, X_test, Y_train, Y_test = train_test_split(
@@ -77,6 +101,7 @@ class SmartStableCV:
 
         gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)
         self.gs_clf = gs_clf.fit(review_train, self.sentiment_train)
+
 
     def predict(self, reviews):
         self.predicted = self.gs_clf.predict(reviews)
@@ -118,6 +143,7 @@ def control():
 
 
     present(model.predict(reviews_test))
+    #print("Accuracy mean:", np.mean(model.predicted == model.sentiment_train))
 
     predicted = model.predict(pd.read_csv("kaggle/input/text-classification-int20h/TRAINing Reviewsset").to_numpy()[:, 0])
     print(predicted, len(predicted))
@@ -128,6 +154,7 @@ def control():
 
     predicted = np.array(predicted).astype(int)
     print(predicted, len(predicted))
+    print("npmean", np.mean(predicted == true_sentiment))
 
     error = 0
     for i in range(len(predicted)):
