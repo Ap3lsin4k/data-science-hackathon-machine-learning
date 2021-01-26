@@ -21,7 +21,8 @@ import nltk
 
 from src.model_wrapper import ClassifierWrapper
 
-#nltk.download('stopwords')
+nltk.download('stopwords')
+nltk.download('punkt')
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -67,10 +68,14 @@ class SmartStableCV:
 
             # Converting to Lowercase
             #
-            #    document = document.lower()
+            document = document.lower()
+            document = document.split()
+
+            document = [stemmer.lemmatize(word) for word in document]
+            document = ' '.join(document)
 
             # Lemmatization
-            document = ' '.join(document)
+            #document = ' '.join(document)
         return document
     def __init__(self):
         self.gs_clf = "string"
@@ -84,8 +89,12 @@ class SmartStableCV:
             self.dump()
 
     def fit(self):
+
+
+        train_csv['processed'] = train_csv['review'].apply(lambda x: process(x))
+
         numpy_array = train_csv.to_numpy()
-        review_train = self.clean(numpy_array[:, 0]) # aka X_train
+        review_train = (numpy_array[:, 0]) # aka X_train
         self.sentiment_train = numpy_array[:, 1].astype('int') # aka Y_train
 
         #X_train, X_test, Y_train, Y_test = train_test_split(
@@ -95,6 +104,7 @@ class SmartStableCV:
                              ('tfidf', TfidfTransformer()),
                              ('clf', MultinomialNB()),
                              ])
+
         parameters = {'clf__alpha': (1e-2, 1e-3),
                       'tfidf__use_idf': (True, False),
                       'vect__ngram_range': [(1, 1), (1, 2)],
@@ -121,7 +131,17 @@ class SmartStableCV:
             self.gs_clf = pickle.load(pickle_in)
             print("Gsclf", self.gs_clf)
 
+stop_words = set(stopwords.words('english'))
 
+
+def process(text):
+    res = re.sub('<.*?>', ' ', text)
+    res = re.sub('\W', ' ', res)
+    res = re.sub('\s+[a-zA-Z]\s+', ' ', res)
+    res = re.sub('\s+', ' ', res)
+    word_tokens = word_tokenize(res)
+    filtered_res = " ".join([w for w in word_tokens if w not in stop_words])
+    return filtered_res
 
 
 def present(sentiment_column, submission_csv_path="model/data/newsubmission.csv"):
@@ -133,6 +153,8 @@ def get_new_submission_path_with_version():
     return datetime.now().strftime("kaggle/working/newsubmission %d %H;%M;%S.csv")  # day hour:minutes:seconds
 
 def control():
+    test['processed'] = test['review'].apply(lambda x: process(x))
+
     sdata = test
     # test.csv
     import numpy as np
